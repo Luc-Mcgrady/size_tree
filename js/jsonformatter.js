@@ -1,28 +1,39 @@
 function find_uid(d, uid) {
-	//console.log(d)
 	if (d.i === uid) return d
 	if (d.t === 'D')
 		for (var i = 0; i < d.c.length; i++) {
 			let result = find_uid(d.c[i], uid)
-			console.log(result)
-			if (result != undefined) return result
+			if (result != undefined) {
+				if (result.length != undefined) // Bad, TODO needs replacing
+					return result
+				return [result, d]
+			}	
 		}
 }
 
 var urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has("id"))
-	data = find_uid(data, parseInt(urlParams.get("id")))
+
+console.log(data.i)
+
+if (urlParams.get("id") != null && urlParams.get("id") != data.i){
+	let result = find_uid(data, parseInt(urlParams.get("id")))
+	data = result[0]
+	var prevdir = result[1]
+}
 
 var graphdata = data.c
-//delete data.c
+delete data.c	//save memory
 var parentdata = data
 
-document.getElementById("heading").innerHTML = data.n
+let heading = document.getElementById("heading")
+heading.innerHTML = data.n
+heading.onclick = function(){
+	window.location.replace("graph.html?id=" + prevdir.i );
+}
+
 document.title = data.n
 
-//data = undefined
-
-// Format the data to reduce background ram usage
+data = undefined	//save memory
 
 sum = 0
 graphdata.forEach(function (item) {
@@ -41,7 +52,7 @@ class Bar {
 		this.onclicked = function() {
 			console.log(sel.bardata)
 			if (sel.bardata.t === 'D')
-			window.location.replace("graph.html?id=" + sel.bardata.i);
+			window.location.replace("graph.html?id=" + sel.bardata.i );
 		}
 		
 		this.newbar = document.createElement("div")
