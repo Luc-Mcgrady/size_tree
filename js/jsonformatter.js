@@ -1,4 +1,4 @@
-function find_uid(d, uid) {
+function find_uid(d, uid) { // Returns the path with the uid and the paths parent
 	if (d.i === uid) return d
 	if (d.t === 'D')
 		for (var i = 0; i < d.c.length; i++) {

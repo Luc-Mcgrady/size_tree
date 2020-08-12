@@ -6,11 +6,14 @@ from quickf import list_flatten
 class FilenameHolder:
     def __init__(self, root=None):
         self.root = root
+        if self.root[-1] == '\\':
+            self.root = root[:-1]
+
         self.new_uid = 0
         # print("Walking")
         self.walk = str_walk_to_dict(root)
         # print("Parsing")
-        self.classes = self._parse_classes(root)
+        self.classes = self._parse_classes(self.root)
         # print(self.classes)
 
         # for path, (dicts, files) in self.walk.items():
@@ -19,10 +22,16 @@ class FilenameHolder:
         out = []
 
         # print(self.walk[path])
+        try:
+            walkpath = self.walk[path]
+        except KeyError:
+            return
+
         print(path)
-        childpaths = [self._parse_classes(path + '\\' + dct) for dct in self.walk[path][0]]
+
+        childpaths = [self._parse_classes(path + '\\' + dct) for dct in walkpath[0]]
         childpaths = list_flatten(childpaths)
-        childpaths += [File(self, path + '\\' + file) for file in self.walk[path][1]]
+        childpaths += [File(self, path + '\\' + file) for file in walkpath[1]]
         out.append(Directory(path, childpaths, self))
 
         return out
@@ -44,12 +53,23 @@ class Path:
 class File(Path):
     def __init__(self, parent: FilenameHolder, path: str):
         super().__init__(parent, path)
-        assert os.path.isfile(path), path
+        # assert os.path.isfile(path), path
+        # Commenting this ^ code out is probably a bad idea but if the file is open it raises the error incorrectly
+        # replaced this with this code
+        if not os.path.isfile(path):
+            del self
 
     def get_size(self):
         if self.size is None:
-            self.size = os.path.getsize(
-                self.absolute_path)  # TODO move to init
+            try:
+                self.size = os.path.getsize(
+                    self.absolute_path)  # TODO move to init
+            except FileNotFoundError:  # Incase the file was deleted while the program was running
+                del self
+                return 0
+            except OSError:
+                del self
+                return 0
         return self.size
 
     def get_info_dict(self):
@@ -60,7 +80,7 @@ class File(Path):
 class Directory(Path):
     def __init__(self, path: str, content_indexes: list, parent: FilenameHolder):
         super().__init__(parent, path)
-        self.contents = content_indexes
+        self.contents = [index for index in content_indexes if index is not None]  # Protects against some wierd bug
         assert os.path.isdir(path)
 
     def get_size(self):
@@ -77,6 +97,8 @@ class Directory(Path):
 def walk_to_dict(walk: list):
     out = {}
     for path, dirs, files in walk:
+        if path[-1] == '\\':
+            path = path[:-1]
         out[path] = (dirs, files)
     return out
 
