@@ -1,29 +1,43 @@
+function find_uid(d, uid) {
+	//console.log(d)
+	if (d.i === uid) return d
+	if (d.t === 'D')
+		for (var i = 0; i < d.c.length; i++) {
+			let result = find_uid(d.c[i], uid)
+			console.log(result)
+			if (result != undefined) return result
+		}
+}
+
+var urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has("id"))
+	data = find_uid(data, parseInt(urlParams.get("id")))
+
 var graphdata = data.c
-delete data.c
+//delete data.c
 var parentdata = data
 
 document.getElementById("heading").innerHTML = data.n
 document.title = data.n
 
-data = undefined
+//data = undefined
 
 // Format the data to reduce background ram usage
 
+sum = 0
 graphdata.forEach(function (item) {
     delete item.c
+	sum += item.s
 })
 
 graphdata.sort( function(a, b){return b.s - a.s } )
 var maxval = graphdata.reduce(function(a, b) {return (a.s > b.s) ? a: b;}).s
 
-function index_on_uid(uid) {
-	
-}
-
 class Bar {
 	constructor (bardata) {
 		this.bardata = bardata
 		var sel = this
+		
 		this.onclicked = function() {
 			console.log(sel.bardata)
 			if (sel.bardata.t === 'D')
@@ -34,7 +48,7 @@ class Bar {
 		
 		this.newbar.innerHTML = ' ' + (bardata.s / 1e+6) + " MB  " + bardata.n
 		this.newbar.className = (bardata.t === 'D') ? "bar_directory" : "bar_file";
-		this.newbar.style.width = 75 * (bardata.s / maxval) + '%'
+		this.newbar.style.width = 100 * (bardata.s / sum) + '%'
 		
 		document.getElementsByClassName("graph")[0].appendChild(this.newbar)
 		this.newbar.onclick = this.onclicked
@@ -43,5 +57,5 @@ class Bar {
 
 var bars = []
 graphdata.forEach(function(item){
-	bars.push(new Bar(item, maxval)) 
+	bars.push(new Bar(item)) 
 })
