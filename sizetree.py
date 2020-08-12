@@ -6,6 +6,7 @@ from quickf import list_flatten
 class FilenameHolder:
     def __init__(self, root=None):
         self.root = root
+        self.new_uid = 0
         # print("Walking")
         self.walk = str_walk_to_dict(root)
         # print("Parsing")
@@ -36,6 +37,8 @@ class Path:
         self.absolute_path = path
         self.size = None
         self.parent = parent
+        self.uid = parent.new_uid
+        parent.new_uid += 1
 
 
 class File(Path):
@@ -50,8 +53,8 @@ class File(Path):
         return self.size
 
     def get_info_dict(self):
-        return {"t": self.__class__.__name__, "n": self.name, "s": self.get_size(), }
-        # Type, name, size
+        return {"i": self.uid, "t": self.__class__.__name__[0], "n": self.name, "s": self.get_size(), }
+        # id, Type, name, size
 
 
 class Directory(Path):
@@ -66,9 +69,9 @@ class Directory(Path):
         return self.size
 
     def get_info_dict(self):
-        return {"t": self.__class__.__name__, "n": self.name, "s": self.get_size(),
+        return {"i": self.uid, "t": self.__class__.__name__[0], "n": self.name, "s": self.get_size(),
                 "c": [a.get_info_dict() for a in self.contents]}
-    # Type, name, size, contents
+    # id, Type, name, size, contents
 
 
 def walk_to_dict(walk: list):
@@ -90,7 +93,7 @@ def index_on(lst: list, func):
 
 
 if __name__ == '__main__':
-    rootdir = ".."
+    rootdir = "../size_tree"
 
     walk = FilenameHolder(rootdir)
     paths = walk.classes
