@@ -1,6 +1,4 @@
 import os.path
-import json
-from quickf import list_flatten
 
 
 class FilenameHolder:
@@ -121,7 +119,15 @@ def index_on(lst: list, func):
     return lst.index(index[0])
 
 
+def list_flatten(lst):
+    out = []
+    if type(lst) == (list or tuple):
+        for a in lst:
+            out += list_flatten(a)
+        return out
+    else:
+        return [lst]
+
+
 if __name__ == '__main__':
     input("you have run the WRONG FILE, run gui.py instead")
-
-
