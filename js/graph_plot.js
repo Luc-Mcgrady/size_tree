@@ -1,5 +1,5 @@
 let urlParams = new URLSearchParams(window.location.search);
-var memory_optimised = false // If false speed optimised (far faster)
+var memory_optimised = options["slow_mode"] // If false speed optimised (far faster)
 var idpath = [sizes.i]
 
 class Bar {

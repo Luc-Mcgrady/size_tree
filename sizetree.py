@@ -4,16 +4,22 @@ from quickf import list_flatten
 
 
 class FilenameHolder:
-    def __init__(self, root=None):
+    def __init__(self, root, print_stages=False, print_indexed_dirs=True):
         self.root = root
         if self.root[-1] == '\\':
             self.root = root[:-1]
 
         self.new_uid = 0
-        # print("Walking")
+
+        if print_stages:
+            print("Walking")
         self.walk = str_walk_to_dict(root)
-        # print("Parsing")
+
+        if print_stages:
+            print("Parsing")
+        self.print_indexed = print_indexed_dirs
         self.classes = self._parse_classes(self.root)
+
         # print(self.classes)
 
         # for path, (dicts, files) in self.walk.items():
@@ -27,7 +33,8 @@ class FilenameHolder:
         except KeyError:
             return
 
-        print(path)
+        if self.print_indexed:
+            print(path)
 
         childpaths = [self._parse_classes(path + '\\' + dct) for dct in walkpath[0]]
         childpaths = list_flatten(childpaths)
@@ -115,15 +122,6 @@ def index_on(lst: list, func):
 
 
 if __name__ == '__main__':
-    rootdir = "../size_tree"
+    input("you have run the WRONG FILE, run gui.py instead")
 
-    walk = FilenameHolder(rootdir)
-    paths = walk.classes
 
-    with open("sizes.json", "w") as f:
-        f.write("var data = ")
-        json.dump(walk.classes[-1].get_info_dict(), f, indent=4)
-    # json.loads(str(paths[0], )
-
-    # for path, dirs, files in size_format_walk(rootdir):
-    #    print(path, dirs, files)
