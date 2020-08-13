@@ -15,8 +15,9 @@ class Gui(tk.Tk):
         self.options_frame.grid(row=1, column=0)
 
         self.checkboxes = {
+            "animated_bars": tk.Checkbutton(self.options_frame, text="Animate the bars"),  # Javascript side \/
             "slow_mode": tk.Checkbutton(self.options_frame, text="Slow mode"),
-            "view_on_finish": tk.Checkbutton(self.options_frame, text="Load page when finished"),
+            "view_on_finish": tk.Checkbutton(self.options_frame, text="Load page when finished"),  # Python side \/
             "print_indexed_dirs": tk.Checkbutton(self.options_frame, text="Print searched directorys"),
         }  # Support for more options as needed (though idk what theyed be)
 
@@ -26,11 +27,9 @@ class Gui(tk.Tk):
             checkbox.config(variable=newvar)
             self.checkbox_vars[key] = newvar
 
-        # Javascript side options [:2]
-        # Python side options [2:]
-
         self.checkboxes["view_on_finish"].select()
         self.checkboxes["print_indexed_dirs"].select()
+        self.checkboxes["animated_bars"].select()
 
         [cb.grid(row=row, column=0) for row, cb in enumerate(self.checkboxes.values())]
 
@@ -74,13 +73,13 @@ class Gui(tk.Tk):
 
         with open("sizes.json", "w") as f:
             f.write("var sizes = ")
-            json.dump(tree.classes[-1].get_info_dict(), f, indent=4)
+            json.dump(tree.classes[-1].get_info_dict(), f, indent=1)
             f.write("\nvar options = ")
             json.dump(options, f, indent=4)
-        
+
         if options["view_on_finish"]:
             os.startfile("graph.html")
-        
+
         self.destroy()
 
 
