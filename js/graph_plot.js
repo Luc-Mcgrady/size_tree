@@ -3,6 +3,8 @@ var memory_optimised = options["slow_mode"] // If false speed optimised (far fas
 var animated = options["animated_bars"]
 var idpath = [sizes.i]
 var bars
+var heading = document.getElementById("heading")
+var absolute_path = document.getElementById("absolute_path")
 
 class Bar {
 	constructor (bardata) {
@@ -11,7 +13,7 @@ class Bar {
 		
 		this.newbar = document.createElement("div")
 		
-		this.newbar.innerHTML = ' ' + (bardata.s / 1e+6) + "MB | " + bardata.n
+		this.newbar.innerText = ' ' + (bardata.s / 1e+6) + "MB | " + bardata.n
 		this.newbar.className = (bardata.t === 'D') ? "bar_directory" : "bar_file";
 		
 		var targetwidth = 100 * (bardata.s / sum)
@@ -32,10 +34,12 @@ class Bar {
 		console.log(this.bardata)
 		window.location.replace("graph.html?id=" + this.bardata.i );
 	}
+	
 	change_dir_id() {
 		console.log(this.bardata)
 		idpath.push(this.bardata.i)
 		plotUid(sizes, this.bardata.i)
+		absolute_path.innerText += '\\' + this.bardata.n 
 	}
 }
 
@@ -56,8 +60,7 @@ function find_uid(d, uid) { // Returns the path with the uid and the paths paren
 function plot_data(gd) { // graphdata
 	unplot()
 	
-	let heading = document.getElementById("heading")
-		heading.innerHTML = gd.n
+		heading.innerText = gd.n
 	
 	sum = 0
 	gd.c.forEach(function (item) {
@@ -83,18 +86,6 @@ function plotUid(data, uid) {
 	let graphdata = values.c
 	
 	let parentdata = values
-	
-	if (memory_optimised)
-		heading.onclick = function(){
-			window.location.replace("graph.html?id=" + prevdir.i );
-		}
-	else
-		heading.onclick = function(){
-			if (idpath.length > 1) {
-				idpath.pop(-1)
-				plotUid(data, idpath[idpath.length - 1])
-			}
-		}
 
 	document.title = values.n
 
@@ -119,6 +110,23 @@ function animate_bar(elem, start, end) { //Start and end are ints repersenting p
 	}
 }
 
+if (memory_optimised)
+	heading.onclick = function(){
+		window.location.replace("graph.html?id=" + prevdir.i );
+	}
+else
+	heading.onclick = function(){
+		if (idpath.length > 1) {
+			idpath.pop(-1)
+			plotUid(sizes, idpath[idpath.length - 1])
+			
+			let foo = absolute_path.innerText.split("\\")
+			absolute_path.innerText = foo.slice(0,foo.length-1).join('\\')
+		}
+	}
+
+
+absolute_path.innerText += sizes.n
 if (memory_optimised) {
 	if (urlParams.get("id") != null && urlParams.get("id") != sizes.i)
 		var bars = plotUid(sizes, parseInt(urlParams.get("id")))
