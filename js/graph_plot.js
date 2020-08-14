@@ -13,7 +13,26 @@ class Bar {
 		
 		this.newbar = document.createElement("div")
 		
-		this.newbar.innerText = ' ' + (bardata.s / 1e+6) + "MB | " + bardata.n
+		var display_num
+		var display_unit // Could be one variable
+		
+
+		if (bardata.s < 1000){
+			display_num = bardata.s
+			display_unit = "B"
+		} else if (bardata.s < 1e+6) {
+			display_num = (bardata.s / 1000).toFixed(2)
+			display_unit = "KB"
+		} else if (bardata.s < 1e+9) {
+			display_num = (bardata.s / 1e+6).toFixed(2)
+			display_unit = "MB"
+		} else {
+			display_num = (bardata.s / 1e+9).toFixed(2)
+			display_unit = "GB"
+		}
+
+		
+		this.newbar.innerText = ' ' + display_num + display_unit + " | " + bardata.n
 		this.newbar.className = (bardata.t === 'D') ? "bar_directory" : "bar_file";
 		
 		var targetwidth = 100 * (bardata.s / sum)
@@ -31,12 +50,12 @@ class Bar {
 	}
 	
 	change_url_id() { //Changes the current dir in the memory optimised way.
-		console.log(this.bardata)
+		//console.log(this.bardata)
 		window.location.replace("graph.html?id=" + this.bardata.i );
 	}
 	
 	change_dir_id() {
-		console.log(this.bardata)
+		//console.log(this.bardata)
 		idpath.push(this.bardata.i)
 		plotUid(sizes, this.bardata.i)
 		absolute_path.innerText += '\\' + this.bardata.n 
