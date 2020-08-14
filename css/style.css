@@ -1,4 +1,4 @@
-div.graph * {white-space: nowrap;font-size:24px; height:5vh; min-height:1.2eh}
+div.graph * {white-space: nowrap;font-size:24px; height:5vh; min-height:2em}
 div.graph {min-height:100%;}
 h1, h4 {text-align:center;}
 *.bar_directory {background-color: #00deff;}
